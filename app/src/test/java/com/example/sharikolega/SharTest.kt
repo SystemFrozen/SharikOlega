@@ -1,8 +1,10 @@
 package com.example.sharikolega
 
-import com.example.sharikolega.tyt_delat.core.Answer
 import com.example.sharikolega.tyt_delat.core.Answers
 import com.example.sharikolega.tyt_delat.core.Shar
+import com.example.sharikolega.tyt_delat.core.SharImpl
+import com.example.sharikolega.tyt_delat.grisha.AnswersRandomGenerator
+import com.example.sharikolega.tyt_delat.grisha.IntToAnswerImpl
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -13,42 +15,57 @@ import org.junit.Assert.*
  * See [testing documentation](http://d.android.com/tools/testing).
  */
 class SharTest {
-
-    private lateinit var shar: Shar
+    fun createShar(answer: Answers): Shar = SharImpl(GrishaMocks.MockAnswersRandomGenerator(answer))
 
     @Test
-    fun addition_isCorrect() {
+    fun `test return some answer`() {
+        val shar: Shar = SharImpl(AnswersRandomGenerator(IntToAnswerImpl()))
+
         val actual = shar.generateAnswer()
+
+        assertTrue(Answers.values().any { it.answerString == actual })
     }
 
     @Test
     fun `test shar return yes answer`() {
-        val shar: Shar =
+        val expectedAnswer = Answers.YES
+
+        val shar: Shar = createShar(expectedAnswer)
 
         val actual = shar.generateAnswer()
-        val expected = Answer(Answers.YES.answerString)
+        val expected = expectedAnswer.answerString
 
-        assertEquals(actual.answer, expected.answer)
+        assertEquals(actual, expected)
     }
 
     @Test
     fun `test shar return no answer`() {
-        val actual = shar.generateAnswer()
-        val expected = Answer(Answers.NO.answerString)
+        val expectedAnswer = Answers.NO
 
-        assertEquals(actual.answer, expected.answer)
+        val shar: Shar = createShar(expectedAnswer)
+
+        val actual = shar.generateAnswer()
+        val expected = expectedAnswer.answerString
+
+        assertEquals(actual, expected)
     }
 
     @Test
     fun `test shar return not_sure answer`() {
-        val actual = shar.generateAnswer()
-        val expected = Answer(Answers.NOT_SURE.answerString)
+        val expectedAnswer = Answers.NOT_SURE
 
-        assertEquals(actual.answer, expected.answer)
+        val shar: Shar = createShar(expectedAnswer)
+
+        val actual = shar.generateAnswer()
+        val expected = expectedAnswer.answerString
+
+        assertEquals(actual, expected)
     }
 
     @Test(expected = IllegalStateException::class)
     fun `test shar return exception not found answer`() {
+        val shar = SharImpl(GrishaMocks.MockAnswersExceptionRandom())
+
         shar.generateAnswer()
     }
 }
